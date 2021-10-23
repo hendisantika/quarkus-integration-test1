@@ -5,9 +5,17 @@ import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.mockito.Mockito;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.net.URL;
+
+import static io.restassured.RestAssured.given;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -21,5 +29,24 @@ public class RegistrationResourceTest {
     @InjectMock
     PasswordGenerator passwordGenerator;
 
+    @Test
+    @Order(1)
+    public void shouldRegisterAUser() {
+
+        Mockito.when(passwordGenerator.generate()).thenReturn("my-secret-password");
+
+        final User user = new User();
+        user.username = "naruto";
+        user.email = "naruto@example.com";
+
+        given()
+                .body(user)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .when().post()
+                .then()
+                .statusCode(Response.Status.CREATED.getStatusCode())
+                .header("location", url + "/1");
+    }
 
 }
