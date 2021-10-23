@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import java.net.URL;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -47,6 +48,19 @@ public class RegistrationResourceTest {
                 .then()
                 .statusCode(Response.Status.CREATED.getStatusCode())
                 .header("location", url + "/1");
+    }
+
+    @Test
+    @Order(2)
+    public void shouldFindAUserByUsername() throws InterruptedException {
+        given()
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .when().get("/{username}", "naruto")
+                .then()
+                .statusCode(200)
+                .body("username", is("naruto"))
+                .body("email", is("naruto@example.com"))
+                .body("password", is("my-secret-password"));
     }
 
 }
