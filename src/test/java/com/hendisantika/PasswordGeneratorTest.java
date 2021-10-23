@@ -1,8 +1,11 @@
 package com.hendisantika;
 
 import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,4 +20,10 @@ import javax.inject.Inject;
 class PasswordGeneratorTest {
     @Inject
     PasswordGenerator passwordGenerator;
+
+    @Test
+    public void shouldGenerateARandomPassword() {
+        final String password = passwordGenerator.generate();
+        assertThat(password).containsPattern("[0-9A-F-]+");
+    }
 }
